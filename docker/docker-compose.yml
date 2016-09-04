@@ -1,0 +1,73 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+---
+version: "2"
+
+services:
+  dashboards_notebook:
+    build:
+      context: .
+      dockerfile: Dockerfile.notebook
+      args:
+        IPYWIDGETS_VER: "5.2.*"
+        DASHBOARDS_VER: "0.6.*"
+        # There is no declarative_widgets release that does not depend on pyspark
+        # DECLWIDGETS_VER: "0.7.0.dev0"
+        # DECLWIDGETS_SHA: "f0364dc68561dc8ce0c4e72db0ff460d1d75db36"
+        CMS_VER: "0.6.*"
+        BUNDLER_VER: "0.8.*"
+    ports:
+      - "8888:8888"
+    depends_on:
+      - dashboards_server
+    links:
+      - dashboards_server
+    volumes:
+      - /c/Users/Paul/dashboards/notebooks:/home/jovyan/work
+    env_file: nb_secrets.env
+    environment:
+      DASHBOARD_SERVER_URL: http://dashboards_server:3000/
+      KG_URL: http://dashboards_kernel_gateway:9888
+    restart: always
+    container_name: rs2-dashboards-notebook
+
+  dashboards_server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboards
+      args:
+          DASHBOARDS_SERVER_VER: ">=0.7.0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - dashboards_kernel_gateway
+    links:
+      - dashboards_kernel_gateway
+    env_file: db_secrets.env
+    environment:
+      PORT: 3000
+      KERNEL_GATEWAY_URL: http://dashboards_kernel_gateway:9888
+    restart: always
+    container_name: rs2-dashboards-server
+    volumes:
+      - /c/Users/Paul/dashboards/app:/srv/app    
+
+  dashboards_kernel_gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.kernel
+      args:
+        IPYWIDGETS_VER: "5.2.*"
+        # DECLWIDGETS_VER: "0.7.0.dev0"
+        # DECLWIDGETS_SHA: "f0364dc68561dc8ce0c4e72db0ff460d1d75db36"
+        KG_VER: "1.0.*"
+        BOKEH_VER: "0.11.*"
+    ports:
+     - "9888:9888"
+    environment:
+      KG_ALLOW_ORIGIN: "*"
+      KG_LIST_KERNELS: "True"
+      KG_PORT: "9888"
+    restart: always
+    container_name: rs2-dashboards-kernel-gateway

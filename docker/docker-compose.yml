@@ -69,5 +69,30 @@ services:
       KG_ALLOW_ORIGIN: "*"
       KG_LIST_KERNELS: "True"
       KG_PORT: "9888"
+      KG_API_URL: http://dashboards_kg_api_demo:8081
     restart: always
     container_name: rs2-dashboards-kernel-gateway
+ 
+  dashboards_kg_api_demo:
+    build:
+      context: .
+      dockerfile: Dockerfile.kernel
+      args:
+        IPYWIDGETS_VER: "5.2.*"
+        KG_VER: "1.0.*"
+        BOKEH_VER: "0.11.*"
+    ports:
+     - "8081:8081"
+    environment:
+      KG_ALLOW_ORIGIN: "*"
+      KG_LIST_KERNELS: "True"
+    restart: always
+    container_name: rs2-kg-api-demo
+    volumes:
+      - /c/Users/Paul/dashboards/notebooks/api:/srv/api    
+    command: >
+        jupyter kernelgateway 
+        --KernelGatewayApp.ip=0.0.0.0 
+        --KernelGatewayApp.port=8081
+        --KernelGatewayApp.api='kernel_gateway.notebook_http'
+        --KernelGatewayApp.seed_uri='/srv/api/api_demo.ipynb'

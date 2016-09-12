@@ -12,9 +12,6 @@ services:
       args:
         IPYWIDGETS_VER: "5.2.*"
         DASHBOARDS_VER: "0.6.*"
-        # There is no declarative_widgets release that does not depend on pyspark
-        # DECLWIDGETS_VER: "0.7.0.dev0"
-        # DECLWIDGETS_SHA: "f0364dc68561dc8ce0c4e72db0ff460d1d75db36"
         CMS_VER: "0.6.*"
         BUNDLER_VER: "0.8.*"
     ports:
@@ -23,8 +20,6 @@ services:
       - dashboards_server
     links:
       - dashboards_server
-    volumes:
-      - /c/Users/Paul/dashboards/notebooks:/home/jovyan/work
     env_file: nb_secrets.env
     environment:
       DASHBOARD_SERVER_URL: http://dashboards_server:3000/
@@ -50,8 +45,6 @@ services:
       KERNEL_GATEWAY_URL: http://dashboards_kernel_gateway:9888
     restart: always
     container_name: rs2-dashboards-server
-    volumes:
-      - /c/Users/Paul/dashboards/app:/srv/app    
 
   dashboards_kernel_gateway:
     build:
@@ -59,8 +52,6 @@ services:
       dockerfile: Dockerfile.kernel
       args:
         IPYWIDGETS_VER: "5.2.*"
-        # DECLWIDGETS_VER: "0.7.0.dev0"
-        # DECLWIDGETS_SHA: "f0364dc68561dc8ce0c4e72db0ff460d1d75db36"
         KG_VER: "1.0.*"
         BOKEH_VER: "0.11.*"
     ports:
@@ -88,8 +79,6 @@ services:
       KG_LIST_KERNELS: "True"
     restart: always
     container_name: rs2-kg-api-demo
-    volumes:
-      - /c/Users/Paul/dashboards/notebooks/api:/srv/api    
     command: >
         jupyter kernelgateway 
         --KernelGatewayApp.ip=0.0.0.0 

@@ -38,11 +38,6 @@ RUN pip install "jupyter_dashboards==$DASHBOARDS_VER" && \
 RUN pip install "git+https://github.com/jupyter/kernel_gateway_demos.git#egg=nb2kg&subdirectory=nb2kg" && \
     jupyter serverextension enable --py nb2kg --sys-prefix
 
-# Install declarative widgets for Jupyter Notebook
-# ARG DECLWIDGETS_VER
-# RUN pip install "jupyter_declarativewidgets==$DECLWIDGETS_VER" && \
-#     jupyter declarativewidgets quick-setup --sys-prefix
-
 # Install content management to support dashboard bundler options
 ARG CMS_VER
 ARG BUNDLER_VER
@@ -51,6 +46,11 @@ RUN pip install "jupyter_cms==$CMS_VER" && \
 RUN pip install "jupyter_dashboards_bundlers==$BUNDLER_VER" && \
 	jupyter dashboards_bundlers quick-setup --sys-prefix
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
+
+ADD notebooks/ /home/jovyan/work/pydata-sep-2016/
+USER root
+RUN chown -R jovyan /home/jovyan/work
+USER jovyan
 
 # Stay as jovyan in the newer docker stack images
 
